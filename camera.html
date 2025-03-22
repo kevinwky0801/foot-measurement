@@ -19,6 +19,11 @@
             height: 297mm; /* A4纸高度 */
             border: 2px solid red;
             z-index: 10;
+            pointer-events: none; /* 防止水印阻挡用户操作 */
+        }
+        #video {
+            width: 100%;
+            height: auto;
         }
     </style>
 </head>
@@ -31,13 +36,21 @@
     <script>
         const video = document.getElementById('video');
 
-        // 访问相机
-        navigator.mediaDevices.getUserMedia({ video: true })
+        // 配置后置相机
+        const constraints = {
+            video: {
+                facingMode: 'environment' // 使用后置相机
+            }
+        };
+
+        // 访问后置相机
+        navigator.mediaDevices.getUserMedia(constraints)
             .then((stream) => {
                 video.srcObject = stream;
             })
             .catch((err) => {
                 console.error("Error accessing the camera: ", err);
+                alert("无法访问后置相机，请确保已授予相机权限。");
             });
     </script>
 </body>
