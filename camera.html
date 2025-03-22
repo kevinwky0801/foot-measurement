@@ -60,6 +60,11 @@
             height: auto;
             border: 1px solid #ccc;
         }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -80,11 +85,15 @@
         <img id="photo" alt="Captured Photo">
     </div>
 
+    <!-- 测量结果显示 -->
+    <div id="result"></div>
+
     <script>
         // 获取页面元素
         const video = document.getElementById('video');
         const captureButton = document.getElementById('capture-button');
         const photo = document.getElementById('photo');
+        const resultDiv = document.getElementById('result');
 
         // 访问摄像头
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -119,12 +128,79 @@
             const photoUrl = canvas.toDataURL('image/png');
             photo.src = photoUrl;
 
-            // 可选：将图片保存到本地
-            const link = document.createElement('a');
-            link.href = photoUrl;
-            link.download = 'foot-measurement.png';
-            link.click();
+            // 分析脚的长度和宽度
+            analyzeFootSize(canvas);
         });
+
+        // 分析脚的长度和宽度
+        function analyzeFootSize(canvas) {
+            const context = canvas.getContext('2d');
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+
+            // 假设A4纸的尺寸是210mm x 297mm
+            const a4WidthMm = 210; // A4纸宽度（毫米）
+            const a4HeightMm = 297; // A4纸高度（毫米）
+
+            // 计算A4纸在图像中的像素尺寸
+            const a4WidthPx = canvas.width * 0.7; // 水印宽度占图像的70%
+            const a4HeightPx = a4WidthPx * (a4HeightMm / a4WidthMm); // 根据比例计算高度
+
+            // 计算像素与毫米的比例
+            const pxToMm = a4WidthMm / a4WidthPx;
+
+            // 假设脚的长度和宽度可以通过图像分析得到
+            // 这里简化处理：假设脚的长度是A4纸高度的50%，宽度是A4纸宽度的30%
+            const footLengthPx = a4HeightPx * 0.5; // 脚的长度（像素）
+            const footWidthPx = a4WidthPx * 0.3; // 脚的宽度（像素）
+
+            // 转换为毫米
+            const footLengthMm = footLengthPx * pxToMm;
+            const footWidthMm = footWidthPx * pxToMm;
+
+            // 转换为厘米
+            const footLengthCm = footLengthMm / 10;
+            const footWidthCm = footWidthMm / 10;
+
+            // 转换为鞋码
+            const shoeSizes = convertToShoeSize(footLengthCm);
+
+            // 显示结果
+            resultDiv.innerHTML = `
+                <p>Foot Length: ${footLengthCm.toFixed(2)} cm</p>
+                <p>Foot Width: ${footWidthCm.toFixed(2)} cm</p>
+                <p>EU Size: ${shoeSizes.eu}</p>
+                <p>UK Size: ${shoeSizes.uk}</p>
+                <p>US Size: ${shoeSizes.us}</p>
+            `;
+        }
+
+        // 转换为鞋码
+        function convertToShoeSize(footLengthCm) {
+            const sizeTable = [
+                { length: 22.0, eu: 35, uk: 2.5, us: 4 },
+                { length: 22.5, eu: 36, uk: 3, us: 5 },
+                { length: 23.0, eu: 37, uk: 4, us: 6 },
+                { length: 23.5, eu: 38, uk: 5, us: 7 },
+                { length: 24.0, eu: 39, uk: 6, us: 8 },
+                { length: 24.5, eu: 40, uk: 7, us: 9 },
+                { length: 25.0, eu: 41, uk: 8, us: 10 },
+                { length: 25.5, eu: 42, uk: 9, us: 11 },
+                { length: 26.0, eu: 43, uk: 10, us: 12 },
+            ];
+
+            // 找到最接近的鞋码
+            let closestSize = sizeTable[0];
+            for (const size of sizeTable) {
+                if (footLengthCm >= size.length) {
+                    closestSize = size;
+                } else {
+                    break;
+                }
+            }
+
+            return closestSize;
+        }
     </script>
 </body>
 </html>
