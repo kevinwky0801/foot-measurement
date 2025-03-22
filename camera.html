@@ -23,17 +23,6 @@
             height: auto;
             display: block;
         }
-        #watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 210mm; /* A4纸宽度 */
-            height: 297mm; /* A4纸高度 */
-            border: 2px solid red;
-            z-index: 10;
-            pointer-events: none; /* 防止水印阻挡用户操作 */
-        }
         #capture {
             margin: 20px;
             padding: 10px 20px;
@@ -58,11 +47,10 @@
 <body>
     <h1>脚部测量</h1>
     <div id="instructions">
-        请将A4纸放在地面上，并将脚放在红色框内，确保脚后跟和脚尖对齐。
+        请将脚放在地面上，并确保脚后跟和脚尖清晰可见。
     </div>
     <div id="camera">
         <video id="video" autoplay></video>
-        <div id="watermark"></div>
     </div>
     <button id="capture" disabled>拍照</button>
     <canvas id="canvas" style="display:none;"></canvas>
