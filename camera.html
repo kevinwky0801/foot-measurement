@@ -20,30 +20,39 @@
             border: 2px solid red;
             z-index: 10;
         }
+        #video {
+            width: 100%;
+            height: auto;
+            background: black; /* 添加背景色以便确认元素是否显示 */
+        }
     </style>
 </head>
 <body>
     <h1>Measure Your Foot</h1>
     <p>Please place your foot inside the frame.</p>
     <div id="camera">
-        <video id="video" autoplay></video>
+        <video id="video" autoplay playsinline></video>
         <div id="watermark"></div>
     </div>
 
     <script>
-        // 访问摄像头
         const video = document.getElementById('video');
 
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) {
-                    video.srcObject = stream;
-                })
-                .catch(function(error) {
-                    console.error("Unable to access the camera: ", error);
-                });
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { exact: "environment" } // 强制使用后置摄像头
+                }
+            })
+            .then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(function(error) {
+                console.error("Error accessing the camera: ", error);
+            });
         } else {
-            console.error("getUserMedia not supported");
+            console.error("getUserMedia is not supported in this browser");
         }
     </script>
 </body>
