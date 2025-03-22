@@ -1,15 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- 设置网页标题 -->
     <title>Camera with A4 Watermark</title>
+
+    <!-- 适配移动端 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 字符编码 -->
+    <meta charset="UTF-8">
+
+    <!-- 网页描述 -->
+    <meta name="description" content="A web app to measure foot size using a camera and A4 watermark.">
+
+    <!-- 关键词 -->
+    <meta name="keywords" content="foot measurement, camera, A4, watermark">
+
+    <!-- 作者 -->
+    <meta name="author" content="Your Name">
+
+    <!-- 引入样式 -->
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
         }
         #camera-container {
             position: relative;
@@ -32,13 +53,31 @@
             border: 2px solid green;
             box-sizing: border-box;
         }
+        #capture-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #capture-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
+    <h1>Align your foot with the A4 watermark</h1>
     <div id="camera-container">
+        <!-- 相机视频流 -->
         <video id="camera-video" autoplay></video>
+        <!-- A4 纸水印 -->
         <div id="watermark"></div>
     </div>
+    <!-- 拍照按钮 -->
+    <button id="capture-button">Capture Photo</button>
 
     <script>
         // 获取相机视频流
@@ -53,26 +92,27 @@
                 console.error('Error accessing camera:', error);
                 alert('Failed to access camera. Please allow camera permissions.');
             });
+
+        // 拍照功能
+        const captureButton = document.getElementById('capture-button');
+        captureButton.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            // 设置画布尺寸与视频一致
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // 将视频画面绘制到画布上
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // 将画布内容转换为图片并下载
+            const photo = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'captured_photo.png';
+            link.href = photo;
+            link.click();
+        });
     </script>
 </body>
-
-<button onclick="capturePhoto()">Capture Photo</button>
-
-<script>
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-
-    function capturePhoto() {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // 将图片保存为文件
-        const photo = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.download = 'captured_photo.png';
-        link.href = photo;
-        link.click();
-    }
-</script>
 </html>
