@@ -5,10 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Measure Your Foot</title>
     <style>
+        /* 页面样式 */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            margin-top: 20px;
+        }
         #camera {
             position: relative;
             width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        #video {
+            width: 100%;
             height: auto;
+            background-color: black;
+            display: block;
         }
         #watermark {
             position: absolute;
@@ -18,26 +36,57 @@
             width: 210mm; /* A4纸宽度 */
             height: 297mm; /* A4纸高度 */
             border: 2px solid red;
-            z-index: 10;
+            box-sizing: border-box;
+            pointer-events: none; /* 防止水印干扰用户操作 */
         }
-        #video {
-            width: 100%;
+        #capture-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #capture-button:hover {
+            background-color: #0056b3;
+        }
+        #photo-container {
+            margin-top: 20px;
+        }
+        #photo {
+            max-width: 100%;
             height: auto;
-            background: black; /* 添加背景色以便确认元素是否显示 */
+            border: 1px solid #ccc;
         }
     </style>
 </head>
 <body>
     <h1>Measure Your Foot</h1>
     <p>Please place your foot inside the frame.</p>
+
+    <!-- 摄像头画面 -->
     <div id="camera">
         <video id="video" autoplay playsinline></video>
         <div id="watermark"></div>
     </div>
 
-    <script>
-        const video = document.getElementById('video');
+    <!-- 拍照按钮 -->
+    <button id="capture-button">Capture Photo</button>
 
+    <!-- 拍照结果显示 -->
+    <div id="photo-container">
+        <img id="photo" alt="Captured Photo">
+    </div>
+
+    <script>
+        // 获取页面元素
+        const video = document.getElementById('video');
+        const captureButton = document.getElementById('capture-button');
+        const photo = document.getElementById('photo');
+
+        // 访问摄像头
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({
                 video: {
@@ -54,6 +103,28 @@
         } else {
             console.error("getUserMedia is not supported in this browser");
         }
+
+        // 拍照功能
+        captureButton.addEventListener('click', function() {
+            // 创建 canvas 元素
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // 将视频画面绘制到 canvas 上
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // 将 canvas 内容转换为图片并显示
+            const photoUrl = canvas.toDataURL('image/png');
+            photo.src = photoUrl;
+
+            // 可选：将图片保存到本地
+            const link = document.createElement('a');
+            link.href = photoUrl;
+            link.download = 'foot-measurement.png';
+            link.click();
+        });
     </script>
 </body>
 </html>
