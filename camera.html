@@ -5,10 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Foot Measurement</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
         #camera {
             position: relative;
             width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        #video {
+            width: 100%;
             height: auto;
+            display: block;
         }
         #watermark {
             position: absolute;
@@ -21,20 +34,44 @@
             z-index: 10;
             pointer-events: none; /* 防止水印阻挡用户操作 */
         }
-        #video {
-            width: 100%;
-            height: auto;
+        #capture {
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #capture:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #instructions {
+            margin: 20px;
+            font-size: 18px;
+            color: #333;
         }
     </style>
 </head>
 <body>
+    <h1>脚部测量</h1>
+    <div id="instructions">
+        请将A4纸放在地面上，并将脚放在红色框内，确保脚后跟和脚尖对齐。
+    </div>
     <div id="camera">
         <video id="video" autoplay></video>
         <div id="watermark"></div>
     </div>
+    <button id="capture" disabled>拍照</button>
+    <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
         const video = document.getElementById('video');
+        const captureButton = document.getElementById('capture');
+        const canvas = document.getElementById('canvas');
+        const instructions = document.getElementById('instructions');
 
         // 配置后置相机
         const constraints = {
@@ -47,11 +84,30 @@
         navigator.mediaDevices.getUserMedia(constraints)
             .then((stream) => {
                 video.srcObject = stream;
+                captureButton.disabled = false; // 启用拍照按钮
             })
             .catch((err) => {
-                console.error("Error accessing the camera: ", err);
-                alert("无法访问后置相机，请确保已授予相机权限。");
+                console.error("无法访问相机: ", err);
+                instructions.textContent = "无法访问后置相机，请确保已授予相机权限。";
             });
+
+        // 拍照功能
+        captureButton.addEventListener('click', () => {
+            // 将视频帧绘制到canvas上
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // 将canvas图像保存为文件
+            const image = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = image;
+            link.download = 'foot_measurement.png';
+            link.click();
+
+            instructions.textContent = "拍照成功！图像已保存。";
+        });
     </script>
 </body>
 </html>
