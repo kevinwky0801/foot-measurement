@@ -1,25 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Open Camera</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foot Measurement</title>
+    <style>
+        #camera {
+            position: relative;
+            width: 100%;
+            height: auto;
+        }
+        #watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 210mm; /* A4纸宽度 */
+            height: 297mm; /* A4纸高度 */
+            border: 2px solid red;
+            z-index: 10;
+        }
+    </style>
 </head>
 <body>
-    <h1>Camera Access</h1>
-    <button onclick="openCamera()">Open Camera</button>
+    <div id="camera">
+        <video id="video" autoplay></video>
+        <div id="watermark"></div>
+    </div>
+
     <script>
-        function openCamera() {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    const video = document.createElement('video');
-                    video.srcObject = stream;
-                    video.play();
-                    document.body.appendChild(video);
-                })
-                .catch(err => {
-                    console.error("Error accessing the camera: ", err);
-                    alert("Unable to access the camera. Please ensure you have granted permission.");
-                });
-        }
+        const video = document.getElementById('video');
+
+        // 访问相机
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((err) => {
+                console.error("Error accessing the camera: ", err);
+            });
     </script>
 </body>
 </html>
