@@ -1,3 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Camera with A4 Watermark</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+        }
+        #camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: auto;
+        }
+        #camera-video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        #watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 210mm; /* A4 width */
+            height: 297mm; /* A4 height */
+            border: 2px solid green;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div id="camera-container">
+        <video id="camera-video" autoplay></video>
+        <div id="watermark"></div>
+    </div>
+
+    <script>
+        // 获取相机视频流
+        const video = document.getElementById('camera-video');
+
+        // 请求访问相机
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((error) => {
+                console.error('Error accessing camera:', error);
+                alert('Failed to access camera. Please allow camera permissions.');
+            });
+    </script>
+</body>
+
 <button onclick="capturePhoto()">Capture Photo</button>
 
 <script>
@@ -17,3 +75,4 @@
         link.click();
     }
 </script>
+</html>
