@@ -17,6 +17,7 @@
                 })
                 .catch(err => {
                     console.error("Error accessing the camera: ", err);
+                    alert("Unable to access the camera. Please ensure you have granted permission.");
                 });
         }
     </script>
